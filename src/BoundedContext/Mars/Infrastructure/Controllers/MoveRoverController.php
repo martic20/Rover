@@ -19,12 +19,14 @@ final class MoveRoverController
 
     public function __invoke(Request $request)
     {
+        //get current instance of the rover
         $getRoverUseCase = new GetRoverUseCase($this->repository);
         $rover = $getRoverUseCase->__invoke();
         if ($rover == null){
             return response()->json(['info'=>'Not initialized'], 422);
         }
 
+        //get request parameters
         if (!$request->filled('commands')) return response()->json(
             ['error' => "Get parameter commands needed"]
             , 422);
@@ -32,6 +34,7 @@ final class MoveRoverController
         $commandsTxt = $request->input('commands');
         
         try {
+            //execute the movement commands
             $moveRoverUseCase = new MoveRoverUseCase($this->repository);
             $moveRoverUseCase->__invoke(
                 $rover,
