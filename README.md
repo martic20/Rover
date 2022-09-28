@@ -1,7 +1,14 @@
 ## Setup
 Clone github.
 Run 'composer install'
+Run './vendor/bin/sail artisan migrate'
 Run './vendor/bin/sail up'
+
+## Use
+
+http://localhost/api/rover/init
+
+
 
 ## License
 

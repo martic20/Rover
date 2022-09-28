@@ -209,7 +209,7 @@ return [
     */
 
     'aliases' => Facade::defaultAliases()->merge([
-        // 'ExampleClass' => App\Example\ExampleClass::class,
+        // 'InitRoverController' => Src\BoundedContext\Mars\Infrastructure\Controllers\InitRoverController::class,
     ])->toArray(),
 
 ];
