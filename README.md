@@ -3,8 +3,9 @@
 1. Clone github.
 2. Run `composer install`
 3. Create file `.env` from `.env.example`
-4. Run `./vendor/bin/sail artisan migrate`
+4. Generate encryption key: `php artisan key:generate`
 5. Run `./vendor/bin/sail up`
+6. Run `./vendor/bin/sail artisan migrate`
 
 ## Use
 
