@@ -21,22 +21,32 @@ final class InitRoverController extends Controller
 
     public function __invoke(Request $request)
     {
-        $direction             = $request->input('direction');
+        $direction = $request->input('direction');
         if($direction==null) return response('Direction needs to be specified.', 422);
-        $positionX             = $request->input('position_x');
-        $positionY             = $request->input('position_y'); 
+
+        $positionX = $request->input('position_x');
+        $positionY = $request->input('position_y'); 
+
 
         // $getRoverUseCase = new GetRoverUseCase($this->repository);
         // $rover = $getRoverUseCase->__invoke();
 
         $initRoverUseCase = new InitRoverUseCase($this->repository);
-        print_r($initRoverUseCase->__invoke(
-            $direction,
-            $positionX,
-            $positionY
-        ));
         
+        try {
+            $initRoverUseCase->__invoke(
+                $direction,
+                $positionX,
+                $positionY
+            );            
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['info'=>'Invalid data value','error' => $e->getMessage()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['info'=>'Error','error' => $e->getMessage()], 422);
+        } catch (\TypeError $e) {
+            return response()->json(['info'=>'Wrong data format','error' => $e->getMessage()], 422);
+        }
 
-        return response('OK', 201);
+        return response()->json(['info'=>'Ok'], 200);
     }
 }

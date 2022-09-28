@@ -28,17 +28,9 @@ final class InitRoverUseCase
 
         $rover = Rover::create($direction, $position);
         
-        //check if exists
-        
+        //check if exists        
         $roverId = $this->repository->getId();
-        // try {
-        //     $user= User::FindOrFail($id);
-        //     return response()->json(['user'=>user], 200);
-        // } catch (\Exception $e) {
-        //     return response()->json(['message'=>'user not found!'], 404);
-        // }
-
-        // print_r($dbRover);
+        
         if ($roverId != null){
             $this->repository->update($roverId, $rover);
         }else{

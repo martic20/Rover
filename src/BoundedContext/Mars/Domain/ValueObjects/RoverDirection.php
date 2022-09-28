@@ -10,6 +10,7 @@ final class RoverDirection
 
     public function __construct(string $direction)
     {
+        $this->validate($direction);
         $this->direction = $direction;
     }
 
