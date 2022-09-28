@@ -1,46 +1,56 @@
 <?php
 
-namespace Src\BoundedContext\Mars\Infrastructure;
+namespace Src\BoundedContext\Mars\Infrastructure\Controllers;
 
 use Illuminate\Http\Request;
-use Src\BoundedContext\Mars\Application\GetUserUseCase;
-use Src\BoundedContext\Mars\Application\UpdateUserUseCase;
-use Src\BoundedContext\Mars\Infrastructure\Repositories\EloquentUserRepository;
+use Src\BoundedContext\Mars\Application\GetRoverUseCase;
+use Src\BoundedContext\Mars\Application\MoveRoverUseCase;
+use Src\BoundedContext\Mars\Infrastructure\Repositories\EloquentRoverRepository;
+use Src\BoundedContext\Mars\Domain\Exceptions\ObstacleException;
 
 final class MoveRoverController
 {
     private $repository;
 
-    public function __construct(EloquentUserRepository $repository)
+    public function __construct(EloquentRoverRepository $repository)
     {
         $this->repository = $repository;
     }
 
     public function __invoke(Request $request)
     {
-        $userId = (int)$request->id;
+        $getRoverUseCase = new GetRoverUseCase($this->repository);
+        $rover = $getRoverUseCase->__invoke();
+        if ($rover == null){
+            return response()->json(['info'=>'Not initialized'], 422);
+        }
 
-        $getUserUseCase = new GetUserUseCase($this->repository);
-        $user           = $getUserUseCase->__invoke($userId);
+        if (!$request->filled('commands')) return response()->json(
+            ['error' => "Get parameter commands needed"]
+            , 422);
 
-        $userName              = $request->input('name') ?? $user->name()->value();
-        $userEmail             = $request->input('email') ?? $user->email()->value();
-        $userEmailVerifiedDate = $user->emailVerifiedDate()->value();
-        $userPassword          = $user->password()->value();
-        $userRememberToken     = $user->rememberToken()->value();
+        $commandsTxt = $request->input('commands');
+        
+        try {
+            $moveRoverUseCase = new MoveRoverUseCase($this->repository);
+            $moveRoverUseCase->__invoke(
+                $rover,
+                $commandsTxt
+            );
+                      
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['info'=>'Invalid data value','error' => $e->getMessage()], 422);
+        } catch (ObstacleException $e) {
+            return response()->json([
+                'info'=>'Obstacle detected, so sequence aborted. Could not finish the command movements.',
+                'rover'=> $rover->toArray()
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['info'=>'Error'], 422);
+        }  catch (\TypeError $e) {
+            return response()->json(['info'=>'Wrong data format','error' => $e->getMessage()], 422);
+        }
 
-        $updateUserUseCase = new UpdateUserUseCase($this->repository);
-        $updateUserUseCase->__invoke(
-            $userId,
-            $userName,
-            $userEmail,
-            $userEmailVerifiedDate,
-            $userPassword,
-            $userRememberToken
-        );
-
-        $updatedUser = $getUserUseCase->__invoke($userId);
-
-        return $updatedUser;
+        return response()->json(['info'=>'Ok','rover'=> $rover->toArray()], 200);
     }
 }

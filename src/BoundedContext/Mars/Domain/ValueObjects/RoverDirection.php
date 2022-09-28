@@ -19,6 +19,13 @@ final class RoverDirection
         return $this->direction;
     }
 
+    public function set(string $direction): RoverDirection
+    {
+        $this->validate($direction);
+        $this->direction = $direction;
+        return $this;
+    }
+
     /**
      * @param int $id
      * @throws InvalidArgumentException

@@ -2,6 +2,13 @@
 
 namespace Src\BoundedContext\Mars\Domain;
 
+/**
+ * The map grid is a 200x200 2D matrix where the corners (x,y) are:
+ *      (0,0) -> Bottom - Left
+ *      (199,0) -> Bottom - Right
+ *      (0,199) -> Top - Left
+ *      (199,199) -> Top - Right
+ */
 final class Map
 {
     
@@ -26,6 +33,16 @@ final class Map
     public function size_y(): int
     {
         return $this->size_y;
+    }
+
+    public function isInside(int $x, int $y): bool
+    {
+        if($x<0) return false;
+        if($x>=$this->size_x) return false;
+        if($y<0) return false;
+        if($y>=$this->size_y) return false;
+
+        return true;
     }
 
     public static function create(

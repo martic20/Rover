@@ -37,7 +37,6 @@ final class EloquentRoverRepository implements RoverRepositoryContract
 
         if($rover==null) return null;
 
-        // Return Domain Rover model
         return new RoverId($rover->id);
     }
 

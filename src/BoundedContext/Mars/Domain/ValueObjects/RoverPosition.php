@@ -3,7 +3,7 @@
 namespace Src\BoundedContext\Mars\Domain\ValueObjects;
 
 use Src\BoundedContext\Mars\Domain\Map;
-use InvalidArgumentException;
+use Src\BoundedContext\Mars\Domain\Exceptions\OutsideMapException;
 
 final class RoverPosition
 {
@@ -24,6 +24,14 @@ final class RoverPosition
         return [$this->x,$this->y];
     }
 
+    public function set(int $x, int $y): RoverPosition
+    {
+        $this->validate($x, $y);
+        $this->x = $x;
+        $this->y = $y;
+        return $this;
+    }
+
     public function x(): int
     {
         return $this->x;
@@ -36,17 +44,17 @@ final class RoverPosition
 
     /**
      * @param int $id
-     * @throws InvalidArgumentException
+     * @throws OutsideMapException
      */
     private function validate(int $x, int $y): void
     {
         if ($x<0 || $x>=$this->map->size_x()) {
-            throw new InvalidArgumentException(
+            throw new OutsideMapException(
                 sprintf('Position x=<%s> has to be a value beetwen 0 and <%s>.', $x, $this->map->size_x())
             );
         }
         if ($y<0 || $y>=$this->map->size_y()) {
-            throw new InvalidArgumentException(
+            throw new OutsideMapException(
                 sprintf('Position y=<%s> has to be a value beetwen 0 and <%s>.', $y, $this->map->size_y())
             );
         }
